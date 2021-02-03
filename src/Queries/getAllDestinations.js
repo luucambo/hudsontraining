@@ -1,4 +1,4 @@
-const getAllDestinations =`
+const getAllDestinations = /* GraphQL */`
 query getAllDestinations{
   getAllDestinations {
     description

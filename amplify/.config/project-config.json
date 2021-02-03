@@ -1,4 +1,7 @@
 {
+  "providers": [
+    "awscloudformation"
+  ],
   "projectName": "sbthi1",
   "version": "3.0",
   "frontend": "javascript",
@@ -8,11 +11,7 @@
       "SourceDir": "src",
       "DistributionDir": "build",
       "BuildCommand": "npm.cmd run-script build",
-      "StartCommand": "npm.cmd run-script start",
-      "ServerlessContainers": true
+      "StartCommand": "npm.cmd run-script start"
     }
-  },
-  "providers": [
-    "awscloudformation"
-  ]
+  }
 }

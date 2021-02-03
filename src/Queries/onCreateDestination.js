@@ -1,4 +1,4 @@
-const newDestinationSub =`
+const onCreateDestination =`
 subscription newDestinationSub {
     newDestination {
         __typename
@@ -15,4 +15,4 @@ subscription newDestinationSub {
     }
 }`;
 
-export default newDestinationSub;
+export default onCreateDestination;

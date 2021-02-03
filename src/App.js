@@ -7,14 +7,17 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { API, graphqlOperation, Amplify } from 'aws-amplify'
 
-import AllDestinations from "./AllDestinations.jsx";
-import AddDestination from "./AddDestination.jsx";
+import DestinationList from "./Component/DestinationList.jsx";
+import AddDestination from "./Component/AddDestination.jsx";
 
 import config from './aws-exports.js'
 
-import newDestinationSub from './Queries/newDestinationSub';
-import addDestination from './Queries/addDestination';
+import onCreateDestination from './Queries/onCreateDestination';
+import onUpdateDestination from './Queries/onUpdateDestination';
+import addDestination from './Queries/onCreateDestination';
 import getAllDestinations from './Queries/getAllDestinations';
+import updateDestination from './Queries/updateDestination';
+
 
 // cấu hình api client
 Amplify.configure(config);
@@ -33,9 +36,14 @@ class Home extends React.Component {
     var destinations = await API.graphql(graphqlOperation(getAllDestinations));
     this.setState({ destinations: destinations.data.getAllDestinations });
 
-    this.newItemAddedSubscription = API.graphql(graphqlOperation(newDestinationSub)
+    API.graphql(graphqlOperation(onCreateDestination)
     ).subscribe({
-      next: ({ provider, value }) => this.handleAddedNewItem(provider, value)
+      next: (provider, value) => this.handleAddedNewItem(provider, value)
+    });
+
+    API.graphql(graphqlOperation(onUpdateDestination)
+    ).subscribe({
+      next: ({ provider, value }) => this.handleUpdatedItem(provider, value)
     });
   }
 
@@ -49,8 +57,27 @@ class Home extends React.Component {
     this.setState({ destinations: destinations });
   }
 
+  handleUpdatedItem = (provider, value) => {
+    console.log(provider, value)
+    var updatedDestination = value.data.onUpdateDestination;
+    console.log('abc',updatedDestination)
+    var destinations = this.state.destinations.map((value, index) => {
+      if (value.id == updatedDestination.id)
+        return updatedDestination;
+      else return value;
+    })
+
+    console.log('abc',destinations)
+    this.setState({ destinations: destinations })
+  }
+
   handleOnAdd = async (data) => {
     await API.graphql(graphqlOperation(addDestination, data));
+  }
+
+  handleSavedItem = async (data) => {
+    console.log(data)
+    await API.graphql(graphqlOperation(updateDestination, { input: data }));
   }
 
   render() {
@@ -69,7 +96,7 @@ class Home extends React.Component {
             <i className="paper plane icon"></i>
             Travel Destinations and Current Conditions
           </h3>
-          <AllDestinations destinations={destinations} addedNewItem={this.handleAddedNewItem} />
+          <DestinationList destinations={destinations} onSavedItem={this.handleSavedItem} addedNewItem={this.handleAddedNewItem} />
           <h4 className="ui horizontal divider header">
             <i className="tag icon"></i>
             Create a destination
