@@ -7,10 +7,6 @@ export default class AddDestination extends Component {
         this.state = this.getInitialState();
     }
 
-    static defaultProps = {
-        onAdd: () => null
-    }
-
     getInitialState = () => ({
         id: '',
         description: '',
@@ -26,10 +22,8 @@ export default class AddDestination extends Component {
 
     handleAdd = () => {
         const { id, description, cityId } = this.state;
-
-        this.setState(this.getInitialState(), () => {
-            this.props.onAdd({ id, description, cityId });
-        });
+        this.props.onAdd({ id, description, cityId });
+        this.setState(this.getInitialState());
     }
 
     handleCancel = () => {

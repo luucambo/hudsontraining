@@ -2,12 +2,12 @@ import React, { Component } from "react";
 
 export default class DestinationForm extends Component {
     state = {
-        description: this.props.destination.description
+        description: this.props.destination.description,
+        cityId: this.props.destination.cityId
     }
 
     handleEditSave = () => {
-        var data = { ...this.state, cityId: this.props.destination.cityId, id:this.props.destination.id };
-        console.log(data)
+        var data = { ...this.state, id: this.props.destination.id };
         typeof (this.props.handleEditSave) == "function" && this.props.handleEditSave(data);
     }
 
@@ -23,12 +23,20 @@ export default class DestinationForm extends Component {
     render() {
         var { destination } = this.props;
         return (
-            <>
-                <label>{destination.id}</label>
-                <input type="text" value={this.state.description} onChange={this.handleFieldEdit.bind(this, 'description')} />
-                <button onClick={this.handleEditSave.bind(this, destination.id)}>Save</button>
-                <button onClick={this.handleEditCancel.bind(this, destination.id)}>Cancel</button>
-            </>
+            <div className='form'>
+                <div className='form-group'>
+                    <label>{destination.id}</label>
+                </div>
+                <div className='form-group'>
+                    <input className='form-control' type="text" value={this.state.description} onChange={this.handleFieldEdit.bind(this, 'description')} />
+                </div>
+                <div className='form-group'>
+                    <input className='form-control' type="text" value={this.state.cityId} onChange={this.handleFieldEdit.bind(this, 'cityId')} />
+                </div>
+
+                <button className='btn btn-warning mr-2' onClick={this.handleEditSave.bind(this, destination.id)}>Save</button>
+                <button className='btn btn-success' onClick={this.handleEditCancel.bind(this, destination.id)}>Cancel</button>
+            </div>
         );
     }
 }

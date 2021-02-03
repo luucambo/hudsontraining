@@ -1,12 +1,10 @@
-const onCreateDestination =`
+const onCreateDestination =/* GraphQL */`
 subscription newDestinationSub {
     newDestination {
-        __typename
         id
         description
         cityId
         conditions {
-            __typename
             description
             current
             maxTemp

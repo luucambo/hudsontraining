@@ -12,12 +12,16 @@ import AddDestination from "./Component/AddDestination.jsx";
 
 import config from './aws-exports.js'
 
-import onCreateDestination from './Queries/onCreateDestination';
-import onUpdateDestination from './Queries/onUpdateDestination';
-import addDestination from './Queries/onCreateDestination';
 import getAllDestinations from './Queries/getAllDestinations';
-import updateDestination from './Queries/updateDestination';
 
+import addDestination from './Queries/addDestination'
+import onCreateDestination from './Queries/onCreateDestination';
+
+import updateDestination from './Queries/updateDestination';
+import onUpdateDestination from './Queries/onUpdateDestination';
+
+import  deleteDestination from './Queries/deleteDestination';
+import onDeleteDestination from './Queries/onDeleteDestination';
 
 // cấu hình api client
 Amplify.configure(config);
@@ -38,12 +42,17 @@ class Home extends React.Component {
 
     API.graphql(graphqlOperation(onCreateDestination)
     ).subscribe({
-      next: (provider, value) => this.handleAddedNewItem(provider, value)
+      next: ({provider, value}) => this.handleAddedNewItem(provider, value)
     });
 
     API.graphql(graphqlOperation(onUpdateDestination)
     ).subscribe({
-      next: ({ provider, value }) => this.handleUpdatedItem(provider, value)
+      next: ({provider, value}) => this.handleUpdatedItem(provider, value)
+    });
+
+    API.graphql(graphqlOperation(onDeleteDestination)
+    ).subscribe({
+      next: ({provider, value}) => this.handleDeleteItem(provider, value)
     });
   }
 
@@ -51,33 +60,48 @@ class Home extends React.Component {
     destinations: []
   }
 
-  handleAddedNewItem = (provider, value) => {
+  //subscriptions
+  handleDeleteItem = (provider,value) => {
+    console.log(provider,value)
+    var deletedDestination = value.data.onDeleteDestination;
+    var destinations = this.state.destinations.filter((value, index) => {
+      if (value.id != deletedDestination.id)
+        return value;
+    })
+
+    this.setState({ destinations: destinations })
+  }
+
+  handleAddedNewItem = (provider,value) => {
+    console.log(provider,value)
     var newDestination = value.data.newDestination;
     var destinations = [...this.state.destinations, newDestination];
     this.setState({ destinations: destinations });
   }
 
-  handleUpdatedItem = (provider, value) => {
-    console.log(provider, value)
+  handleUpdatedItem = (provider,value) => {
+    console.log(provider,value)
     var updatedDestination = value.data.onUpdateDestination;
-    console.log('abc',updatedDestination)
     var destinations = this.state.destinations.map((value, index) => {
       if (value.id == updatedDestination.id)
         return updatedDestination;
       else return value;
     })
 
-    console.log('abc',destinations)
     this.setState({ destinations: destinations })
   }
 
+  //commponent handle functions
   handleOnAdd = async (data) => {
     await API.graphql(graphqlOperation(addDestination, data));
   }
 
-  handleSavedItem = async (data) => {
-    console.log(data)
+  handleOnUpdate = async (data) => {
     await API.graphql(graphqlOperation(updateDestination, { input: data }));
+  }
+
+  handleOnDelete = async (data) => {
+    await API.graphql(graphqlOperation(deleteDestination, { input: data }));
   }
 
   render() {
@@ -96,7 +120,7 @@ class Home extends React.Component {
             <i className="paper plane icon"></i>
             Travel Destinations and Current Conditions
           </h3>
-          <DestinationList destinations={destinations} onSavedItem={this.handleSavedItem} addedNewItem={this.handleAddedNewItem} />
+          <DestinationList destinations={destinations} onSave={this.handleOnUpdate} onDelete={this.handleOnDelete} />
           <h4 className="ui horizontal divider header">
             <i className="tag icon"></i>
             Create a destination
@@ -115,64 +139,5 @@ const App = () => (
     </div>
   </Router>
 );
-
-// const AllDestinationsWithData = compose(
-//   graphql(AllDestinationsQuery, {
-//     options: {
-//       fetchPolicy: 'cache-and-network'
-//     },
-//     props: (props) => {
-//       return {
-//         destinations: props.data.getAllDestinations,
-
-//         // START - NEW PROP :
-//         subscribeToDestinations: params => {
-//           props.data.subscribeToMore({
-//             document: NewDestinationsSubscription,
-//             updateQuery: (previousResult, { subscriptionData, variables }) => {
-//               // Perform updates on previousResult with subscriptionData
-//               console.log(previousResult);
-
-//               var newDestination = subscriptionData.data.newDestination;
-//               console.log(newDestination);
-
-//               const newObj = {};
-//               newObj.getAllDestinations = [newDestination, ...previousResult.getAllDestinations];
-//               console.log(newObj);
-
-//               return newObj;
-//             }
-
-//             // (prev, { subscriptionData: {data: {newDestination}} }) => ({
-//             //   ...prev,
-//             //   getAllDestinations: { getAllDestinations: [newDestination, prev.getAllDestinations.filter(d => d.id != newDestination.id)] , __typename: 'Destinations'}
-//             // })
-//           });
-//         }
-//       }
-//     }
-//   })
-// )(AllDestinations);
-
-// const NewDestinationWithData = graphql(NewDestinationMutation, {
-//   props: (props) => ({
-//     onAdd: destination => props.mutate({
-//       variables: destination,
-//       optimisticResponse: () => ({ addDestination: { ...destination, __typename: 'Destination', version: 1 } }),
-//     })
-//   }),
-//   options: {
-//     //refetchQueries: [{ query: AllDestinationsQuery }],
-//     update: (dataProxy, { data: { addDestination } }) => {
-//       const query = AllDestinationsQuery;
-//       const data = dataProxy.readQuery({ query });
-//       data.getAllDestinations.push(addDestination);
-
-//       dataProxy.writeQuery({ query, data });
-//     },
-//     fetchPolicy: 'no-cache',
-//     disableOffline: false
-//   }
-// })(AddDestination);
 
 export default App;
