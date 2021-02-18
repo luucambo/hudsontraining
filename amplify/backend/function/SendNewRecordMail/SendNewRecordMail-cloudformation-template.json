@@ -69,7 +69,7 @@
         "Timeout": "25",
         "Code": {
           "S3Bucket": "amplify-sbthi1-sbbthi-141506-deployment",
-          "S3Key": "amplify-builds/SendNewRecordMail-515a7267486c352b3736-build.zip"
+          "S3Key": "amplify-builds/SendNewRecordMail-6954456d4654364f5059-build.zip"
         }
       }
     },

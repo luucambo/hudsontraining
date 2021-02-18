@@ -1,7 +1,23 @@
 
 exports.handler = (event) => {
+  console.log(event)
+  
   var nodemailer = require('nodemailer');
   var smtpTransport = require('nodemailer-smtp-transport');
+  var handlebars = require('handlebars');
+  var fs = require('fs');
+
+  var readHTMLFile = function (path, callback) {
+    fs.readFile(path, { encoding: 'utf-8' }, function (err, html) {
+      if (err) {
+        callback(err);
+      }
+      else {
+        callback(null, html);
+      }
+    });
+  };
+
 
   var transporter = nodemailer.createTransport(smtpTransport({
     service: 'gmail',
@@ -11,30 +27,36 @@ exports.handler = (event) => {
     }
   }));
 
-  var text = 'Email body goes here';
-
-  var mailOptions = {
-    from: 'luucambotdub@gmail.com',
-    to: 'lcbo@tma.com.vn',
-    subject: 'Test subject',
-    text: text
-  };
-
-  transporter.sendMail(mailOptions, function (error, info) {
-    if (error) {
-      console.log(error);
-      const response = {
-        statusCode: 500,
-        body: JSON.stringify({
-          error: error.message,
-        }),
-      };
+  readHTMLFile('template.html', function (err, html) {
+    if(err)
+    {
+      console.log(err);
+      return;
     }
-    const response = {
-      statusCode: 200,
-      body: JSON.stringify({
-        message: `Email processed succesfully!`
-      }),
+    var template = handlebars.compile(html);
+    var replacements = {
+      logContent: JSON.stringify(event.Records)
     };
-  });
-};
+    
+    console.log("replacements",replacements)
+    
+    var htmlToSend = template(replacements);
+
+    var mailOptions = {
+      from: 'luucambotdub@gmail.com',
+      to: 'lcbo@tma.com.vn',
+      subject: 'Destination dynamo table mail log message',
+      html: htmlToSend
+    };
+    transporter.sendMail(mailOptions, function (error) {
+
+      if (error) {
+        console.log(error);
+      }
+    });
+  })
+}
+  
+
+
+ 
