@@ -14,7 +14,7 @@ export default class Destination extends Component {
     }
 
     onDeleteDestination = () => {
-        typeof (this.props.onDelete) === "function" && this.props.onDelete({id:this.props.destination.id})
+        typeof (this.props.onDelete) === "function" && this.props.onDelete({ id: this.props.destination.id })
     }
 
     handleEditCancel = () => {
@@ -22,8 +22,13 @@ export default class Destination extends Component {
     }
 
     handleEditSave = (data) => {
-        this.setState({ isEditing: false });
-        typeof (this.props.onSave) === "function" && this.props.onSave(data);
+        if (data.cityId && data.description) {
+            this.setState({ isEditing: false });
+            typeof (this.props.onSave) === "function" && this.props.onSave(data);
+        } else {
+            alert("Please fill info");
+            return;
+        }
     }
 
     render() {
@@ -38,8 +43,8 @@ export default class Destination extends Component {
 
                                 <DestinationView destination={destination} />
                                 <div className='float-right'>
-                                    <button className='btn btn-warning btn-small mr-2'><FontAwesomeIcon icon={faEdit} onClick={this.onEditDestination}></FontAwesomeIcon></button>
-                                    <button className='btn btn-danger btn-small'><FontAwesomeIcon icon={faTimes} onClick={this.onDeleteDestination} /></button>
+                                    <button className='btn btn-warning btn-small mr-2' onClick={this.onEditDestination}><FontAwesomeIcon icon={faEdit}></FontAwesomeIcon></button>
+                                    <button className='btn btn-danger btn-small' onClick={this.onDeleteDestination}><FontAwesomeIcon icon={faTimes} /></button>
                                 </div>
                             </>
                             : <DestinationForm destination={destination} handleEditSave={this.handleEditSave} handleEditCancel={this.handleEditCancel} />

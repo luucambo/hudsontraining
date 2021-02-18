@@ -22,8 +22,13 @@ export default class AddDestination extends Component {
 
     handleAdd = () => {
         const { id, description, cityId } = this.state;
-        this.props.onAdd({ id, description, cityId });
-        this.setState(this.getInitialState());
+        if (cityId && description) {
+            this.props.onAdd({ id, description, cityId });
+            this.setState(this.getInitialState());
+        } else{
+            alert('Please fill info');
+            return;
+        }
     }
 
     handleCancel = () => {

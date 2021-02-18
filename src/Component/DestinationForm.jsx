@@ -28,9 +28,11 @@ export default class DestinationForm extends Component {
                     <label>{destination.id}</label>
                 </div>
                 <div className='form-group'>
+                    <label>Description</label>
                     <input className='form-control' type="text" value={this.state.description} onChange={this.handleFieldEdit.bind(this, 'description')} />
                 </div>
                 <div className='form-group'>
+                    <label>City id</label>
                     <input className='form-control' type="text" value={this.state.cityId} onChange={this.handleFieldEdit.bind(this, 'cityId')} />
                 </div>
 
